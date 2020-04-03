@@ -4,11 +4,28 @@
     <title> Scryfall API test </title>
     <meta charset="utf-8">
     <script type="text/javascript">
-        
+        function load_data() {
+            request = new XMLHttpRequest();
+            request.open("GET", "https://api.scryfall.com/cards/autocomplete?q=thal", true);
+            request.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    raw_data = this.responseText;
+                    document.getElementById("serializedData").innerHTML = raw_data;
+                } else if (this.readyState == 4) {
+                    alert("Could not load data");
+                }
+            }
+            request.send();
+        }
     </script>
 </head>
 <body>
     Welcome to Miles' mtg web app!
+    <div id="serializedData"> </div>
+
+    <script type="text/javascript">
+        load_data();
+    </script>
 
 </body>
 </html>
