@@ -5,12 +5,52 @@
     <meta charset="utf-8">
     <script type="text/javascript">
         function load_data() {
+            var auto_array = new Array;
+            card_name = document.getElementById("card_name_input").value;
+            https_string = "https://api.scryfall.com/cards/autocomplete?q=" + card_name;
+
             request = new XMLHttpRequest();
-            request.open("GET", "https://api.scryfall.com/cards/autocomplete?q=thal", true);
+            request.open("GET", https_string, true);
             request.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
                     raw_data = this.responseText;
-                    document.getElementById("serializedData").innerHTML = raw_data;
+                    // document.getElementById("serializedData").innerHTML = raw_data;
+                    raw_data = raw_data.substring(raw_data.indexOf("{"));
+                    json_obj = JSON.parse(raw_data);
+                    auto_array = json_obj.data;
+                    num_suggests = Math.min(6, auto_array.length);
+                    auto_suggests = document.getElementById("auto_suggests");
+                    auto_suggests.innerHTML = "";
+                    for (i = 0; i < num_suggests; i++) {
+                        auto_suggests.innerHTML += "<div onclick=\"fill(this.innerHTML)\" class=\"suggestion\">" + auto_array[i] + "</div>";
+                    }
+
+                } else if (this.readyState == 4) {
+                    alert("Could not load data");
+                }
+            }
+            request.send();
+        }
+
+        function fill(contents) {
+            document.getElementById("card_name_input").value = contents;
+            document.getElementById("auto_suggests").innerHTML = "";
+        }
+
+        function get_image() {
+            card_name = document.getElementById("card_name_input").value;
+            https_string = "https://api.scryfall.com/cards/named?fuzzy=" + card_name;
+            request = new XMLHttpRequest();
+            request.open("GET", https_string, true);
+            request.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    raw_data = this.responseText;
+                    raw_data = raw_data.substring(raw_data.indexOf("{"));
+                    json_obj = JSON.parse(raw_data);
+                    img_url = json_obj.image_uris.normal;
+
+                    document.getElementById("the_image").src = img_url;
+
                 } else if (this.readyState == 4) {
                     alert("Could not load data");
                 }
@@ -18,14 +58,122 @@
             request.send();
         }
     </script>
+
+    <style type="text/css">
+        body {
+            font-family: Helvetica;
+            background-color: #b3ccea;
+            position: relative;
+        }
+
+        .search_bar {
+            margin-top: 30px;
+        }
+
+        .search_bar div {
+            margin: 0 auto;
+            display: block;
+            position: relative;
+            width: 250px;
+            text-align: center;
+        }
+
+        .suggestion {
+            width: 250px;
+            padding: 5px 10px;
+            font-size: 18px;
+            margin-left: -25px !important;
+            background-color: #A69F9D;
+            color: #150b00;
+            border: none;
+            border-bottom: 2px solid  #150b00;
+            border-left: 2px solid  #150b00;
+            border-right: 2px solid  #150b00;
+
+        }
+
+        .suggestion:hover {
+            background-color: #F9FAF4;
+            cursor: pointer;
+        }
+        
+
+        #card_name_input {
+            width: 250px;
+            padding: 5px 10px;
+            border: 2px solid #D3202A;
+            font-size: 18px;
+            border-radius: 2px;
+            background-color: #EB9F82;
+        }
+
+        input[type=text] {
+            outline: none;
+        }
+       
+        .button {
+            padding: 5px 5px;
+            background-color: #C4D3CA;
+            font-size: 18px;
+            border: 2px solid #00733E;
+            outline: none;
+            color: #00733E;
+        }
+
+        #the_image {
+            
+
+            margin: 0 auto;
+            margin-top: 50px;
+
+            display: block;
+        }
+
+        .button:hover {
+            background-color: #F9FAF4;
+            cursor: pointer;
+        }
+
+        .header {
+            font-size: 32px;
+            text-align: center;
+            background-color: #0E68AB;
+            padding: 10px;
+            border-radius: 10px;
+            color: #F9FAF4;
+            box-shadow: 0px 0px 4px #000;
+            
+        }
+
+    </style>
+
+    
+
 </head>
 <body>
-    Welcome to Miles' mtg web app!
-    <div id="serializedData"> </div>
+    <div class="header"> Scryfall API test </div>
+   <!--  <div id="serializedData"> </div> -->
 
-    <script type="text/javascript">
-        load_data();
-    </script>
 
+    <form>
+        <div class="search_bar">
+            <div style="font-size: 20px">Card Name:</div>
+
+            <div style="display: inline; left:50%; margin-left: -150px;">
+                <input id="card_name_input" type="text" name="card_name_input" 
+                onkeyup="load_data()">
+                <input type="button" value="Search" class="button" onclick="get_image()">
+            </div>
+
+            <div id="auto_suggests"> </div>
+        </div>
+    </form>
+
+    <img id="the_image" src="" height="500px">
+    
 </body>
 </html>
+
+
+
+
