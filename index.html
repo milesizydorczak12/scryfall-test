@@ -3,6 +3,13 @@
 <head>
     <title> Scryfall API test </title>
     <meta charset="utf-8">
+
+
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <meta charset="utf-8">
+
+    <meta name="google-signin-client_id" content="806432936357-olo281vm6qr13a2ur80l8f8qifmva7rd.apps.googleusercontent.com">
+
     <script type="text/javascript">
         function load_data() {
             var auto_array = new Array;
@@ -24,9 +31,9 @@
                     for (i = 0; i < num_suggests; i++) {
                         auto_suggests.innerHTML += "<div onclick=\"fill(this.innerHTML)\" class=\"suggestion\">" + auto_array[i] + "</div>";
                     }
-
                 } else if (this.readyState == 4) {
-                    alert("Could not load data");
+                    var error_here = document.getElementById("card_name_input");
+                    error_here.innerHTML = "Please enter a valid card";
                 }
             }
             request.send();
@@ -52,7 +59,8 @@
                     document.getElementById("the_image").src = img_url;
 
                 } else if (this.readyState == 4) {
-                    alert("Could not load data");
+                    var error_here = document.getElementById("card_name_input");
+                    error_here.value = "Please enter a valid card";
                 }
             }
             request.send();
@@ -105,6 +113,8 @@
             font-size: 18px;
             border-radius: 2px;
             background-color: #EB9F82;
+            box-shadow: 0px 0px 4px #000;
+
         }
 
         input[type=text] {
@@ -170,6 +180,7 @@
     </form>
 
     <img id="the_image" src="" height="500px">
+    <div class="g-signin2" data-onsuccess="onSignIn"></div>
     
 </body>
 </html>
